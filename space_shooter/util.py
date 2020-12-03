@@ -1,16 +1,16 @@
 from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import LPoint3, TextNode, TransparencyAttrib
+from panda3d.core import LPoint2, TextNode, TransparencyAttrib
 
 from space_shooter.constants import *
 
 
-def load_object(tex=None, pos=LPoint3(0, 0), depth=SPRITE_POS, scale=1,
+def load_object(tex=None, pos=LPoint2(0, 0), depth=SPRITE_POS, scale=1,
                 transparency=True, parent=None):
     obj = loader.loadModel("assets/models/plane")
     obj.reparentTo(parent or camera.parent)
 
     obj.setPos(pos.getX(), depth, pos.getY())
-    obj.setScale(scale)
+    obj.setScale(0.015 * scale)
 
     obj.setBin("unsorted", 0)
     obj.setDepthTest(False)
@@ -20,6 +20,10 @@ def load_object(tex=None, pos=LPoint3(0, 0), depth=SPRITE_POS, scale=1,
 
     if tex:
         tex = loader.loadTexture(tex)
+        vec = obj.getScale()
+        vec.x *= tex.getOrigFileXSize()
+        vec.z *= tex.getOrigFileYSize()
+        obj.setScale(vec)
         obj.setTexture(tex, 1)
 
     return obj

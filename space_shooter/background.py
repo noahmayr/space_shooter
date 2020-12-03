@@ -7,7 +7,7 @@ class Layer:
     obj: NodePath
 
     def __init__(self, file, mod, depth, transparent=True):
-        self.obj = load_object(file, scale=64, depth=depth, transparency=transparent)
+        self.obj = load_object(file, depth=depth, transparency=transparent)
         self.obj.setBin("background", 100 - depth)
         tex = self.obj.get_texture()
         tex.setWrapU(Texture.WM_repeat)

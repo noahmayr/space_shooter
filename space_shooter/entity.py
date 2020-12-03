@@ -2,7 +2,7 @@ from math import sin, cos
 from random import randint
 
 import Box2D as b2D
-from panda3d.core import LPoint3, NodePath
+from panda3d.core import LPoint2, NodePath
 
 from space_shooter.constants import *
 from space_shooter.util import load_object
@@ -105,7 +105,7 @@ class Bullet(Entity):
         self.expires = globalClock.long_time + BULLET_LIFE
         self.shooter = shooter
         super().__init__(world, "assets/img/Lasers/laserRed01.png",
-                         {"position": position, "angle": angle, "bullet": True}, scale=.2)
+                         {"position": position, "angle": angle, "bullet": True})
 
     def update(self, dt):
         super().update(dt)
