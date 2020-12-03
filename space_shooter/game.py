@@ -1,17 +1,17 @@
-#!/usr/bin/env python
-
-from direct.showbase.ShowBase import ShowBase
-from panda3d.core import TextNode, OrthographicLens, LineSegs, NodePath
-from direct.gui.OnscreenText import OnscreenText
-from direct.task.Task import Task
 from math import sin, cos
 from random import choice, random
-from space_shooter.entity import World, Player, Asteroid
-from space_shooter.input import Input
+
+from Box2D import b2Vec2
+from direct.gui.OnscreenText import OnscreenText
+from direct.showbase.ShowBase import ShowBase
+from direct.task.Task import Task
+from panda3d.core import TextNode, OrthographicLens, LineSegs, NodePath, TransparencyAttrib
+from pandac.PandaModules import WindowProperties
+
 from space_shooter.background import Background
 from space_shooter.constants import *
-from pandac.PandaModules import WindowProperties
-from Box2D import b2Vec2
+from space_shooter.entity import World, Player, Asteroid
+from space_shooter.input import Input
 
 
 class Game(ShowBase):
@@ -34,20 +34,24 @@ class Game(ShowBase):
         self.world = World()
         self.player = Player(self.world)
         self.input = Input(self.player)
+
         self.asteroids = []
         self.closest_asteroid = None
         self.spawnAsteroids()
+
         self.line = LineSegs()
-        self.line.set_thickness(5)
-        self.line.set_color(1, 0, 0, 1)
-        self.line.moveTo(self.player.obj.getPos())
-        self.line.drawTo(self.closest_asteroid.obj.getPos())
+        self.line.setThickness(15)
+        self.line.setColor(1, 0.1, 0.2, 0.4)
+        self.line.moveTo(0, 55, 0)
+        self.line.drawTo(self.closest_asteroid.obj.getPos() - self.player.obj.getPos())
         self.geom = self.line.create(True)
         self.line_node_path = NodePath(self.geom)
         self.line_node_path.reparentTo(render)
-        self.line_node_path.hide()
+        self.line_node_path.setTransparency(TransparencyAttrib.MAlpha)
+
         lens = OrthographicLens()
         base.cam.node().setLens(lens)
+
         self.input.on_window_event(self.win)
         self.inputTask = taskMgr.add(self.input.update, "input")
         self.gameTask = taskMgr.add(self.gameLoop, "gameLoop", sort=1)
@@ -59,11 +63,11 @@ class Game(ShowBase):
         self.world.update(dt)
         self.spawnAsteroids()
         if self.closest_asteroid:
-            self.line.set_vertex(0, self.player.obj.getPos())
-            self.line.set_vertex(1, self.closest_asteroid.obj.getPos())
-        camera.setPosHpr(self.player.obj, 0, 0, 0, 0, 0, 0)
-        camera.setY(-50)
-        self.background.update(camera.getPos())
+            self.line_node_path.setPos(self.player.obj.getPos())
+            self.line.setVertex(1, self.closest_asteroid.obj.getPos() - self.player.obj.getPos())
+        base.cam.setPosHpr(self.player.obj, 0, 0, 0, 0, 0, 0)
+        base.cam.setY(-50)
+        self.background.update(base.cam.getPos())
         return Task.cont
 
     def spawnAsteroids(self):

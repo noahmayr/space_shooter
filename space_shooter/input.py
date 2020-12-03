@@ -1,9 +1,11 @@
+from math import sin, cos
+
+from Box2D import b2Vec2
 from direct.showbase import DirectObject
 from direct.task.Task import Task
-from math import sin, cos
+
 import space_shooter.entity
 from space_shooter.constants import *
-from Box2D import b2Vec2
 
 
 class Input(DirectObject.DirectObject):
@@ -50,7 +52,6 @@ class Input(DirectObject.DirectObject):
             self.entity.body.linearDamping = 1
         else:
             self.entity.body.linearDamping = 0
-
 
         if self.keys["fire"]:
             self.entity.fire()
