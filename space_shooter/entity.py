@@ -5,7 +5,7 @@ import Box2D as b2D
 from panda3d.core import LPoint2, NodePath
 
 from space_shooter.constants import *
-from space_shooter.util import load_object
+from space_shooter.util import load_object, SelfLoadingNodePath
 
 
 class ContactListener(b2D.b2ContactListener):
@@ -84,6 +84,29 @@ class Entity(NodePath):
         pass
 
 
+class Thruster(SelfLoadingNodePath):
+
+    def __init__(self, parent, pos, angle=0, tex="down_blue02.png"):
+        super().__init__("assets/img/effects/fire/%s" % tex, pos=pos,
+                         parent=parent,
+                         model="assets/models/plane_top_pivot.egg")
+        self.setBin("fixed", 1)
+        self.exhaust_scale = self.getScale()
+        self.setR(angle)
+        self.thrust_time = 0
+
+    def thrust(self, enabled, dt):
+        thrust = 0
+        if enabled:
+            self.thrust_time = min(self.thrust_time + dt, 1)
+            thrust = 1 - 1 / (pow(3 * self.thrust_time + .1, 3) + 1)
+            self.show()
+        else:
+            self.thrust_time = 0
+            self.hide()
+        self.setScale(self.exhaust_scale.x, self.exhaust_scale.y, self.exhaust_scale.z * thrust)
+
+
 class Player(Entity):
 
     def __init__(self, world):
@@ -91,6 +114,11 @@ class Player(Entity):
         self.body.angularDamping = 0.5
         self.nextBullet = 0.0
         self.fireRate = 10
+        self.thruster = Thruster(self, LPoint2(0, -.6))
+        self.thruster_left = Thruster(self, LPoint2(.4, -.5), 20)
+        self.thruster_right = Thruster(self, LPoint2(-.4, -.5), -20)
+        self.thruster_left.exhaust_scale.z /= 3
+        self.thruster_right.exhaust_scale.z /= 3
 
     def fire(self):
         if globalClock.long_time >= self.nextBullet:

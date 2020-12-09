@@ -47,6 +47,9 @@ class Input(DirectObject.DirectObject):
                 vel.Normalize()
                 vel *= MAX_VEL
             self.entity.body.linearVelocity = vel
+        self.entity.thruster.thrust(self.keys["accel"], dt)
+        self.entity.thruster_right.thrust(self.keys["turnRight"], dt)
+        self.entity.thruster_left.thrust(self.keys["turnLeft"], dt)
 
         if self.keys["brake"]:
             self.entity.body.linearDamping = 1
