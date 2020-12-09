@@ -53,26 +53,28 @@ class World:
             if entity in self.entities:
                 self.entities.remove(entity)
                 self.physics.DestroyBody(entity.body)
-                entity.obj.removeNode()
+                entity.removeNode()
 
 
-class Entity:
+class Entity(NodePath):
     body: b2D.b2Body
     obj: NodePath
     alive = True
 
-    def __init__(self, world: World, file, bodyDef: dict = {}, *args, **kwargs):
+    def __init__(self, world: World, file, body_def: dict = {}, parent=None, *args, **kwargs):
+        super().__init__(type(self).__name__.lower())
         self.world = world
-        self.body = world.physics.CreateBody(**({"type": b2D.b2_dynamicBody, "userData": self} | bodyDef))
-        self.obj = load_object(file, *args, **kwargs)
+        self.body = world.physics.CreateBody(**({"type": b2D.b2_dynamicBody, "userData": self} | body_def))
+        self.obj = load_object(file, parent=self, *args, **kwargs)
+        self.reparentTo(parent or camera.parent)
         self.box = self.body.CreateCircleFixture(radius=0.5 * self.obj.get_scale().x, userData=self, density=1,
                                                  friction=0.3)
         world.entities.append(self)
 
     def update(self, dt):
         pos = self.body.position
-        self.obj.setPos(pos.x, SPRITE_POS, pos.y)
-        self.obj.setR(self.body.angle)
+        self.setPos(pos.x, SPRITE_POS, pos.y)
+        self.setR(self.body.angle)
 
     def kill(self):
         self.alive = False

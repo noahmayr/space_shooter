@@ -43,9 +43,8 @@ class Game(ShowBase):
         self.line.setThickness(15)
         self.line.setColor(1, 0.1, 0.2, 0.4)
         self.line.moveTo(0, 55, 0)
-        self.line.drawTo(self.closest_asteroid.obj.getPos() - self.player.obj.getPos())
-        self.geom = self.line.create(True)
-        self.line_node_path = NodePath(self.geom)
+        self.line.drawTo(self.closest_asteroid.getPos() - self.player.getPos())
+        self.line_node_path = NodePath(self.line.create(True))
         self.line_node_path.reparentTo(render)
         self.line_node_path.setTransparency(TransparencyAttrib.MAlpha)
 
@@ -61,10 +60,9 @@ class Game(ShowBase):
 
         self.spawnAsteroids()
         self.world.update(dt)
-        self.spawnAsteroids()
         if self.closest_asteroid:
-            self.line_node_path.setPos(self.player.obj.getPos())
-            self.line.setVertex(1, self.closest_asteroid.obj.getPos() - self.player.obj.getPos())
+            self.line_node_path.setPos(self.player.getPos())
+            self.line.setVertex(1, self.closest_asteroid.getPos() - self.player.getPos())
         base.cam.setPosHpr(self.player.obj, 0, 0, 0, 0, 0, 0)
         base.cam.setY(-50)
         self.background.update(base.cam.getPos())

@@ -10,7 +10,7 @@ from space_shooter.constants import *
 
 class Input(DirectObject.DirectObject):
 
-    def __init__(self, entity: space_shooter.entity.Entity):
+    def __init__(self, entity: space_shooter.entity.Player):
         super().__init__()
         self.entity = entity
 
@@ -41,7 +41,7 @@ class Input(DirectObject.DirectObject):
 
         if self.keys["accel"]:
             vel = self.entity.body.linearVelocity
-            heading_rad = DEG_TO_RAD * self.entity.obj.getR()
+            heading_rad = DEG_TO_RAD * self.entity.getR()
             vel += b2Vec2(sin(heading_rad), cos(heading_rad)) * ACCELERATION * dt
             if vel.lengthSquared > MAX_VEL_SQ:
                 vel.Normalize()
