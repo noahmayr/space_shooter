@@ -10,8 +10,9 @@ from pandac.PandaModules import WindowProperties
 
 from space_shooter.background import Background
 from space_shooter.constants import *
-from space_shooter.entity import World, Player, Asteroid
-from space_shooter.input import Input
+from space_shooter.entity import World, Asteroid
+from space_shooter.input import InputController
+from space_shooter.ship import Ship
 
 
 class Game(ShowBase):
@@ -32,8 +33,8 @@ class Game(ShowBase):
         self.background = Background()
 
         self.world = World()
-        self.player = Player(self.world)
-        self.input = Input(self.player)
+        self.player = Ship(self.world)
+        self.input = InputController(self.player)
 
         self.asteroids = []
         self.closest_asteroid = None
@@ -52,7 +53,6 @@ class Game(ShowBase):
         base.cam.node().setLens(lens)
 
         self.input.on_window_event(self.win)
-        self.inputTask = taskMgr.add(self.input.update, "input")
         self.gameTask = taskMgr.add(self.gameLoop, "gameLoop", sort=1)
 
     def gameLoop(self, task):
