@@ -90,7 +90,7 @@ class Thruster(SelfLoadingNodePath):
         super().__init__("assets/img/effects/fire/%s" % tex, pos=pos,
                          parent=parent,
                          model="assets/models/plane_top_pivot.egg")
-        self.setBin("fixed", 1)
+        self.setBin("fixed", -1)
         self.exhaust_scale = self.getScale()
         self.setR(angle)
         self.thrust_time = 0
@@ -136,6 +136,7 @@ class Bullet(Entity):
         self.shooter = shooter
         super().__init__(world, "assets/img/Lasers/laserRed01.png",
                          {"position": position, "angle": angle, "bullet": True})
+        self.obj.setBin("fixed", -1)
 
     def update(self, dt):
         super().update(dt)

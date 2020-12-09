@@ -51,10 +51,8 @@ class Input(DirectObject.DirectObject):
         self.entity.thruster_right.thrust(self.keys["turnRight"], dt)
         self.entity.thruster_left.thrust(self.keys["turnLeft"], dt)
 
-        if self.keys["brake"]:
-            self.entity.body.linearDamping = 1
-        else:
-            self.entity.body.linearDamping = 0
+        self.entity.body.linearDamping = 1 if self.keys["brake"] else 0
+        self.entity.body.angularDamping = 1 if self.keys["turnRight"] and self.keys["turnLeft"] else 0.5
 
         if self.keys["fire"]:
             self.entity.fire()
