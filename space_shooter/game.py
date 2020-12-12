@@ -92,4 +92,6 @@ class Game(ShowBase):
                 closest = length
                 self.closest_asteroid = asteroid
         self.asteroids = new_asteroids
-        self.bottom_text.text = "Asteroids: %d | Closest: %dkm" % (len(self.asteroids), closest)
+        self.bottom_text.text = "Speed: %d | Asteroids: %d | Closest: %dkm" % (
+        self.player.body.linearVelocity.copy().Normalize(),
+        len(self.asteroids), closest)
