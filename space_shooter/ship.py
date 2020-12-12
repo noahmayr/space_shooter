@@ -66,12 +66,13 @@ class Ship(Entity):
         if self.controller:
             self.controller.update(dt)
 
-    def fire(self):
+    def fire(self, deviation=5):
         if globalClock.long_time >= self.nextBullet:
             self.nextBullet = globalClock.long_time + 1 / self.fireRate
-            direction = DEG_TO_RAD * self.body.angle
+            angle = self.body.angle + random.uniform(-1, 1) * deviation
+            direction = DEG_TO_RAD * angle
             vel = (self.body.linearVelocity + (b2D.b2Vec2(sin(direction), cos(direction)) * BULLET_SPEED))
-            bullet = Bullet(self.world, self, position=self.body.position, angle=self.body.angle)
+            bullet = Bullet(self.world, self, position=self.body.position, angle=angle)
             bullet.body.linearVelocity = vel
 
 
