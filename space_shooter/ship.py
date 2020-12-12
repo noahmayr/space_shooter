@@ -1,4 +1,5 @@
 from math import sin, cos
+import random
 
 import Box2D as b2D
 from panda3d.core import LPoint2
@@ -14,7 +15,7 @@ class ShipController:
         self.ship = ship
         ship.controller = self
         self.keys = {"turnLeft": 0, "turnRight": 0,
-                     "accel": 0, "fire": 0, "brake": 0}
+                     "accel": 0, "fire": 0, "brake": 0, "strafeLeft": 0, "strafeRight": 0}
 
     def set_key(self, key, val):
         self.keys[key] = val
@@ -28,20 +29,25 @@ class ShipController:
             spin += dif * dt
             self.ship.body.angularVelocity = min(TURN_RATE, max(-TURN_RATE, spin))
 
+        vel = self.ship.body.linearVelocity
+        heading_rad = DEG_TO_RAD * self.ship.getR()
+        heading_vec: b2D.b2Vec2 = b2D.b2Vec2(sin(heading_rad), cos(heading_rad))
+        if self.keys["strafeLeft"]:
+            self.ship.body.ApplyForceToCenter(b2D.b2Vec2(-heading_vec.y, heading_vec.x) * ACCELERATION, True)
+        if self.keys["strafeRight"]:
+            self.ship.body.ApplyForceToCenter(b2D.b2Vec2(heading_vec.y, -heading_vec.x) * ACCELERATION, True)
+
         if self.keys["accel"]:
-            vel = self.ship.body.linearVelocity
-            heading_rad = DEG_TO_RAD * self.ship.getR()
-            vel += b2D.b2Vec2(sin(heading_rad), cos(heading_rad)) * ACCELERATION * dt
-            if vel.lengthSquared > MAX_VEL_SQ:
-                vel.Normalize()
-                vel *= MAX_VEL
-            self.ship.body.linearVelocity = vel
+            self.ship.body.ApplyForceToCenter(b2D.b2Vec2(sin(heading_rad), cos(heading_rad)) * ACCELERATION, True)
+
         self.ship.thruster.thrust(self.keys["accel"], dt)
         self.ship.thruster_right.thrust(self.keys["turnRight"], dt)
         self.ship.thruster_left.thrust(self.keys["turnLeft"], dt)
+        self.ship.thruster_right_strafe.thrust(self.keys["strafeRight"], dt)
+        self.ship.thruster_left_strafe.thrust(self.keys["strafeLeft"], dt)
 
-        self.ship.body.linearDamping = 1 if self.keys["brake"] else 0
-        self.ship.body.angularDamping = 1 if self.keys["turnRight"] and self.keys["turnLeft"] else 0.5
+        self.ship.body.linearDamping = 1.5 if self.keys["brake"] else 0.5
+        self.ship.body.angularDamping = 1.5 if self.keys["turnRight"] and self.keys["turnLeft"] else 0.5
 
         if self.keys["fire"]:
             self.ship.fire()
@@ -56,6 +62,8 @@ class Ship(Entity):
         self.nextBullet = 0.0
         self.fireRate = 10
         self.thruster = Thruster(self, LPoint2(0, -.6))
+        self.thruster_left_strafe = Thruster(self, LPoint2(.8, -.175), -70)
+        self.thruster_right_strafe = Thruster(self, LPoint2(-.8, -.175), 70)
         self.thruster_left = Thruster(self, LPoint2(.4, -.5), 20)
         self.thruster_right = Thruster(self, LPoint2(-.4, -.5), -20)
         self.thruster_left.exhaust_scale.z /= 3
