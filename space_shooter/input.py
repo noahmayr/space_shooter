@@ -3,6 +3,16 @@ from direct.showbase.DirectObject import DirectObject
 from space_shooter.constants import *
 from space_shooter.ship import ShipController
 
+KEYMAP = {
+    "accel": ["arrow_up", "w"],
+    "turnLeft": ["arrow_left", "a"],
+    "brake": ["arrow_down", "s"],
+    "turnRight": ["arrow_right", "d"],
+    "strafeLeft": ["q"],
+    "strafeRight": ["e"],
+    "fire": ["space"],
+}
+
 
 class InputController(ShipController, DirectObject):
 
@@ -11,16 +21,10 @@ class InputController(ShipController, DirectObject):
         ShipController.__init__(self, ship)
 
         self.accept(base.win.getWindowEvent(), self.on_window_event)
-        self.accept("arrow_left", self.set_key, ["turnLeft", TURN_RATE])
-        self.accept("arrow_left-up", self.set_key, ["turnLeft", 0])
-        self.accept("arrow_right", self.set_key, ["turnRight", TURN_RATE])
-        self.accept("arrow_right-up", self.set_key, ["turnRight", 0])
-        self.accept("arrow_up", self.set_key, ["accel", 1])
-        self.accept("arrow_up-up", self.set_key, ["accel", 0])
-        self.accept("arrow_down", self.set_key, ["brake", 1])
-        self.accept("arrow_down-up", self.set_key, ["brake", 0])
-        self.accept("space", self.set_key, ["fire", 1])
-        self.accept("space-up", self.set_key, ["fire", 0])
+        for action, keys in KEYMAP.items():
+            for key in keys:
+                self.accept("%s" % key, self.set_key, [action, 1])
+                self.accept("%s-up" % key, self.set_key, [action, 0])
 
     def on_window_event(self, window):
         width = window.getProperties().getXSize()

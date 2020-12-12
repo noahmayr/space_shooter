@@ -22,7 +22,7 @@ class ShipController:
     def update(self, dt):
 
         spin = self.ship.body.angularVelocity
-        turn = (self.keys["turnRight"] - self.keys["turnLeft"])
+        turn = (self.keys["turnRight"] - self.keys["turnLeft"]) * TURN_RATE
         if turn != 0:
             dif = turn - spin
             spin += dif * dt
